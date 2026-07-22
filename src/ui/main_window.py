@@ -17,6 +17,7 @@ from models.image_document import ImageDocument
 
 from processing.processor import ImageProcessor
 from processing.palette import PaletteManager
+from export.image_exporter import ImageExporter
 
 
 class MainWindow(QMainWindow):
@@ -52,7 +53,11 @@ class MainWindow(QMainWindow):
         exit_action = QAction("Exit", self)
         exit_action.triggered.connect(self.close)
 
+        export_action = QAction("Export Image...", self)
+        export_action.triggered.connect(self.export_image)
+
         file_menu.addAction(open_action)
+        file_menu.addAction(export_action)
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
 
@@ -344,6 +349,32 @@ class MainWindow(QMainWindow):
         self.cell_size_label.setText(f"{value} px")
 
         self.update_preview()
+    
+    ######################################################
+    
+    def export_image(self):
+
+        if self.document.processed is None:
+            return
+
+        filename, _ = QFileDialog.getSaveFileName(
+            self,
+            "Export Image",
+            "output.png",
+            "PNG Image (*.png);;JPEG Image (*.jpg)"
+        )
+
+        if not filename:
+            return
+
+        ImageExporter.save(
+            self.document.processed,
+            filename
+        )
+
+        self.statusBar().showMessage(
+            f"Exported: {filename}"
+        )    
     
     ######################################################
 
