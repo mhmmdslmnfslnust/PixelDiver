@@ -69,8 +69,6 @@ class MainWindow(QMainWindow):
 
         controls.addWidget(QLabel("<h2>Resize</h2>"))
 
-        ##################################################
-
         controls.addWidget(QLabel("Width"))
 
         self.width_slider = QSlider(Qt.Horizontal)
@@ -81,8 +79,6 @@ class MainWindow(QMainWindow):
 
         controls.addWidget(self.width_slider)
         controls.addWidget(self.width_label)
-
-        ##################################################
 
         controls.addSpacing(15)
 
@@ -97,16 +93,12 @@ class MainWindow(QMainWindow):
         controls.addWidget(self.height_slider)
         controls.addWidget(self.height_label)
 
-        ##################################################
-
         controls.addSpacing(20)
 
         self.lock_ratio = QCheckBox("Lock Aspect Ratio")
         self.lock_ratio.setChecked(True)
 
         controls.addWidget(self.lock_ratio)
-
-        ##################################################
 
         controls.addSpacing(20)
 
@@ -129,9 +121,21 @@ class MainWindow(QMainWindow):
 
         controls.addSpacing(20)
 
-        self.palette_checkbox = QCheckBox("Enable Palette Reduction")
+        self.palette_checkbox = QCheckBox(
+            "Enable Palette Reduction"
+        )
 
         controls.addWidget(self.palette_checkbox)
+
+        ##################################################
+        # Dithering
+        ##################################################
+
+        self.dithering_checkbox = QCheckBox(
+            "Enable Floyd-Steinberg Dithering"
+        )
+
+        controls.addWidget(self.dithering_checkbox)
 
         ##################################################
 
@@ -172,6 +176,10 @@ class MainWindow(QMainWindow):
         )
 
         self.palette_checkbox.stateChanged.connect(
+            self.update_preview
+        )
+
+        self.dithering_checkbox.stateChanged.connect(
             self.update_preview
         )
 
@@ -273,7 +281,7 @@ class MainWindow(QMainWindow):
             height=self.height_slider.value(),
             resize_method=self.resize_method.currentText(),
             palette=palette,
-            dithering=False,
+            dithering=self.dithering_checkbox.isChecked(),
         )
 
         self.document.processed = image
