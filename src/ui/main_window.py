@@ -147,6 +147,33 @@ class MainWindow(QMainWindow):
 
         ##################################################
 
+        ##################################################
+        # Grid
+        ##################################################
+
+        controls.addSpacing(20)
+
+        controls.addWidget(QLabel("Grid"))
+
+        self.grid_checkbox = QCheckBox("Show Grid")
+
+        controls.addWidget(self.grid_checkbox)
+
+        controls.addSpacing(10)
+
+        controls.addWidget(QLabel("Cell Size"))
+
+        self.cell_size_slider = QSlider(Qt.Horizontal)
+
+        self.cell_size_slider.setRange(5, 40)
+        self.cell_size_slider.setValue(20)
+
+        controls.addWidget(self.cell_size_slider)
+
+        self.cell_size_label = QLabel("20 px")
+
+        controls.addWidget(self.cell_size_label)
+
         controls.addStretch()
 
         sidebar = QWidget()
@@ -193,6 +220,14 @@ class MainWindow(QMainWindow):
 
         self.dithering_checkbox.stateChanged.connect(
             self.update_preview
+        )
+
+        self.grid_checkbox.stateChanged.connect(
+            self.update_preview
+        )
+
+        self.cell_size_slider.valueChanged.connect(
+            self.cell_size_changed
         )
 
     ######################################################
@@ -303,6 +338,14 @@ class MainWindow(QMainWindow):
         self.update_preview()
 
     ######################################################
+    
+    def cell_size_changed(self, value):
+
+        self.cell_size_label.setText(f"{value} px")
+
+        self.update_preview()
+    
+    ######################################################
 
     def update_preview(self):
 
@@ -330,6 +373,8 @@ class MainWindow(QMainWindow):
             resize_method=self.resize_method.currentText(),
             palette=palette,
             dithering=self.dithering_checkbox.isChecked(),
+            show_grid=self.grid_checkbox.isChecked(),
+            cell_size=self.cell_size_slider.value(),
         )
 
         self.document.processed = image

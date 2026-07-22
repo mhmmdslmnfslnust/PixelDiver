@@ -1,5 +1,5 @@
 from processing.resizer import ImageResizer
-
+from processing.grid_renderer import GridRenderer
 
 class ImageProcessor:
     """
@@ -16,6 +16,8 @@ class ImageProcessor:
         resize_method,
         palette=None,
         dithering=False,
+        show_grid=False,
+        cell_size=20,
     ):
         # Step 1 - Resize
         image = ImageResizer.resize(
@@ -33,6 +35,15 @@ class ImageProcessor:
                 image,
                 palette,
                 dithering,
+            )
+
+        # Step 3 - Grid
+
+        if show_grid:
+
+            image = GridRenderer.render(
+                image,
+                cell_size=cell_size
             )
 
         return image
