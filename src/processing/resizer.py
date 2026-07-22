@@ -11,7 +11,7 @@ class ImageResizer:
     }
 
     @classmethod
-    def resize(cls, image, width, height, method="Nearest"):
+    def resize(cls, image, width, height, method):
 
         return image.resize(
             (width, height),

@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 
 from ui.image_viewer import ImageViewer
 from models.image_document import ImageDocument
+from processing.resizer import ImageResizer
 
 
 class MainWindow(QMainWindow):
@@ -33,7 +34,7 @@ class MainWindow(QMainWindow):
 
         self.statusBar().showMessage("Ready")
 
-    ########################################################
+    ######################################################
 
     def _create_menu(self):
 
@@ -49,7 +50,7 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
 
-    ########################################################
+    ######################################################
 
     def _create_layout(self):
 
@@ -58,13 +59,15 @@ class MainWindow(QMainWindow):
 
         main_layout = QHBoxLayout()
 
-        ####################################################
-        # LEFT CONTROL PANEL
-        ####################################################
+        ##################################################
+        # Sidebar
+        ##################################################
 
         controls = QVBoxLayout()
 
         controls.addWidget(QLabel("<h2>Resize</h2>"))
+
+        ##################################################
 
         controls.addWidget(QLabel("Width"))
 
@@ -76,6 +79,8 @@ class MainWindow(QMainWindow):
 
         controls.addWidget(self.width_slider)
         controls.addWidget(self.width_label)
+
+        ##################################################
 
         controls.addSpacing(15)
 
@@ -90,12 +95,16 @@ class MainWindow(QMainWindow):
         controls.addWidget(self.height_slider)
         controls.addWidget(self.height_label)
 
+        ##################################################
+
         controls.addSpacing(20)
 
         self.lock_ratio = QCheckBox("Lock Aspect Ratio")
         self.lock_ratio.setChecked(True)
 
         controls.addWidget(self.lock_ratio)
+
+        ##################################################
 
         controls.addSpacing(20)
 
@@ -115,39 +124,40 @@ class MainWindow(QMainWindow):
         controls.addStretch()
 
         sidebar = QWidget()
-        sidebar.setLayout(controls)
         sidebar.setMaximumWidth(250)
+        sidebar.setLayout(controls)
 
-        ####################################################
-        # IMAGE AREA
-        ####################################################
+        ##################################################
+        # Images
+        ##################################################
 
         images = QHBoxLayout()
 
         self.original_label = ImageViewer("Original Image")
-
-        self.processed_label = ImageViewer(
-            "Processed Preview\n\n(Phase 4)"
-        )
+        self.processed_label = ImageViewer("Processed Preview")
 
         images.addWidget(self.original_label)
         images.addWidget(self.processed_label)
 
-        ####################################################
+        ##################################################
 
         main_layout.addWidget(sidebar)
         main_layout.addLayout(images)
 
         central.setLayout(main_layout)
 
-        ####################################################
-        # SIGNALS
-        ####################################################
+        ##################################################
+        # Signals
+        ##################################################
 
         self.width_slider.valueChanged.connect(self.width_changed)
         self.height_slider.valueChanged.connect(self.height_changed)
 
-    ########################################################
+        self.resize_method.currentTextChanged.connect(
+            self.update_preview
+        )
+
+    ######################################################
 
     def open_image(self):
 
@@ -169,13 +179,25 @@ class MainWindow(QMainWindow):
 
         self.aspect_ratio = width / height
 
+        self.width_slider.blockSignals(True)
+        self.height_slider.blockSignals(True)
+
         self.width_slider.setValue(min(width, 300))
+        self.height_slider.setValue(min(height, 300))
+
+        self.width_slider.blockSignals(False)
+        self.height_slider.blockSignals(False)
+
+        self.width_label.setText(str(self.width_slider.value()))
+        self.height_label.setText(str(self.height_slider.value()))
+
+        self.update_preview()
 
         self.statusBar().showMessage(
-            f"{filename}   ({width} × {height})"
+            f"{filename} ({width} × {height})"
         )
 
-    ########################################################
+    ######################################################
 
     def width_changed(self, value):
 
@@ -193,7 +215,9 @@ class MainWindow(QMainWindow):
                 str(self.height_slider.value())
             )
 
-    ########################################################
+        self.update_preview()
+
+    ######################################################
 
     def height_changed(self, value):
 
@@ -210,3 +234,23 @@ class MainWindow(QMainWindow):
             self.width_label.setText(
                 str(self.width_slider.value())
             )
+
+        self.update_preview()
+
+    ######################################################
+
+    def update_preview(self):
+
+        if self.document.original is None:
+            return
+
+        resized = ImageResizer.resize(
+            self.document.original,
+            self.width_slider.value(),
+            self.height_slider.value(),
+            self.resize_method.currentText()
+        )
+
+        self.document.resized = resized
+
+        self.processed_label.set_pil_image(resized)
