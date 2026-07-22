@@ -1,23 +1,93 @@
-class Palettes:
-    """
-    Built-in palettes.
+import csv
+import os
 
-    Later these will be loaded from JSON files.
-    """
 
-    BASIC = [
-        (0, 0, 0),         # Black
-        (255, 255, 255),   # White
+class Palette:
 
-        (255, 0, 0),       # Red
-        (0, 255, 0),       # Green
-        (0, 0, 255),       # Blue
+    def __init__(self, name, colors):
+        self.name = name
+        self.colors = colors
 
-        (255, 255, 0),     # Yellow
-        (255, 165, 0),     # Orange
 
-        (128, 0, 128),     # Purple
-        (165, 42, 42),     # Brown
+class PaletteManager:
 
-        (128, 128, 128),   # Gray
-    ]
+    def __init__(self):
+
+        self.palettes = {}
+
+    ##################################################
+
+    def load(self, csv_file):
+
+        palette = self._read_csv(csv_file)
+
+        self.palettes[palette.name] = palette
+
+    ##################################################
+
+    def get(self, name):
+
+        return self.palettes.get(name)
+
+    ##################################################
+
+    def names(self):
+
+        return sorted(self.palettes.keys())
+
+    ##################################################
+
+    @staticmethod
+    def rgb_list(palette):
+
+        return [
+
+            color["rgb"]
+
+            for color in palette.colors
+
+        ]
+
+    ##################################################
+
+    @staticmethod
+    def _read_csv(csv_file):
+
+        colors = []
+
+        with open(csv_file, newline="", encoding="utf-8") as file:
+
+            reader = csv.DictReader(file)
+
+            for row in reader:
+
+                colors.append({
+
+                    "name": row["Name"],
+
+                    "code": row["Code"],
+
+                    "rgb": (
+                        int(row["R"]),
+                        int(row["G"]),
+                        int(row["B"])
+                    )
+
+                })
+
+        name = os.path.splitext(
+            os.path.basename(csv_file)
+        )[0]
+
+        return Palette(name, colors)
+
+    @staticmethod
+    def rgb_list(palette):
+
+        return [
+
+            color["rgb"]
+
+            for color in palette.colors
+
+        ]

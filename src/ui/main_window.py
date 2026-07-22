@@ -16,7 +16,7 @@ from ui.image_viewer import ImageViewer
 from models.image_document import ImageDocument
 
 from processing.processor import ImageProcessor
-from processing.palette import Palettes
+from processing.palette import PaletteManager
 
 
 class MainWindow(QMainWindow):
@@ -26,6 +26,8 @@ class MainWindow(QMainWindow):
 
         self.document = ImageDocument()
 
+        self.palette_manager = PaletteManager()     
+
         self.aspect_ratio = 1.0
 
         self.setWindowTitle("Diver")
@@ -33,6 +35,8 @@ class MainWindow(QMainWindow):
 
         self._create_menu()
         self._create_layout()
+
+        self.load_palettes()
 
         self.statusBar().showMessage("Ready")
 
@@ -127,6 +131,10 @@ class MainWindow(QMainWindow):
 
         controls.addWidget(self.palette_checkbox)
 
+        self.palette_dropdown = QComboBox()
+
+        controls.addWidget(self.palette_dropdown)
+
         ##################################################
         # Dithering
         ##################################################
@@ -179,9 +187,40 @@ class MainWindow(QMainWindow):
             self.update_preview
         )
 
+        self.palette_dropdown.currentTextChanged.connect(
+            self.update_preview
+        )
+
         self.dithering_checkbox.stateChanged.connect(
             self.update_preview
         )
+
+    ######################################################
+    def load_palettes(self):
+
+        import os
+
+        palette_folder = "palettes"
+
+        if not os.path.isdir(palette_folder):
+            return
+
+        for filename in sorted(os.listdir(palette_folder)):
+
+            if filename.endswith(".csv"):
+
+                path = os.path.join(
+                    palette_folder,
+                    filename
+                )
+
+                self.palette_manager.load(path)
+
+        self.palette_dropdown.clear()
+
+        for name in self.palette_manager.names():
+
+            self.palette_dropdown.addItem(name)
 
     ######################################################
 
@@ -272,8 +311,17 @@ class MainWindow(QMainWindow):
 
         palette = None
 
-        if self.palette_checkbox.isChecked():
-            palette = Palettes.BASIC
+        if (
+            self.palette_checkbox.isChecked()
+            and self.palette_dropdown.currentText()
+        ):
+
+            selected = self.palette_manager.get(
+                self.palette_dropdown.currentText()
+            )
+
+            if selected is not None:
+                palette = PaletteManager.rgb_list(selected)
 
         image = ImageProcessor.process(
             image=self.document.original,
