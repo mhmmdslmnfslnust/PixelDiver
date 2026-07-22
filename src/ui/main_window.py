@@ -48,6 +48,7 @@ class MainWindow(QMainWindow):
     def _create_menu(self):
 
         file_menu = self.menuBar().addMenu("File")
+        palette_menu = self.menuBar().addMenu("Palette")
 
         open_action = QAction("Open Image...", self)
         open_action.triggered.connect(self.open_image)
@@ -56,10 +57,21 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
 
         export_action = QAction("Export Image...", self)
+        reload_palette_action = QAction(
+            "Reload Palettes",
+            self
+        )
+
+        reload_palette_action.triggered.connect(
+            self.reload_palettes
+        )
         export_action.triggered.connect(self.export_image)
 
         file_menu.addAction(open_action)
         file_menu.addAction(export_action)
+        palette_menu.addAction(
+            reload_palette_action
+        )
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
 
@@ -240,6 +252,14 @@ class MainWindow(QMainWindow):
     ######################################################
     def load_palettes(self):
 
+        self.palette_dropdown.blockSignals(True)
+
+        current = self.palette_dropdown.currentText()
+
+        self.palette_dropdown.clear()
+
+        self.palette_manager.palettes.clear()
+
         import os
 
         palette_folder = "palettes"
@@ -257,13 +277,29 @@ class MainWindow(QMainWindow):
                 )
 
                 self.palette_manager.load(path)
-
+        current = self.palette_dropdown.currentText()
         self.palette_dropdown.clear()
 
         for name in self.palette_manager.names():
 
             self.palette_dropdown.addItem(name)
 
+        index = self.palette_dropdown.findText(current)
+
+        if index >= 0:
+            self.palette_dropdown.setCurrentIndex(index)
+
+        self.palette_dropdown.blockSignals(False)
+    ######################################################
+    def reload_palettes(self):
+
+        self.load_palettes()
+
+        self.update_preview()
+
+        self.statusBar().showMessage(
+            "Palettes reloaded."
+        )
     ######################################################
 
     def open_image(self):

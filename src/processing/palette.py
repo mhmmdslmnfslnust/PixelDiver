@@ -1,4 +1,5 @@
 import csv
+from models.palette import Palette, PaletteColor
 import os
 
 
@@ -42,7 +43,7 @@ class PaletteManager:
 
         return [
 
-            color["rgb"]
+            color.rgb
 
             for color in palette.colors
 
@@ -61,19 +62,25 @@ class PaletteManager:
 
             for row in reader:
 
-                colors.append({
+                colors.append(
 
-                    "name": row["Name"],
+                    PaletteColor(
 
-                    "code": row["Code"],
+                        len(colors) + 1,
 
-                    "rgb": (
-                        int(row["R"]),
-                        int(row["G"]),
-                        int(row["B"])
+                        row["Name"],
+
+                        row["Code"],
+
+                        (
+                            int(row["R"]),
+                            int(row["G"]),
+                            int(row["B"])
+                        )
+
                     )
 
-                })
+                )
 
         name = os.path.splitext(
             os.path.basename(csv_file)
@@ -86,7 +93,7 @@ class PaletteManager:
 
         return [
 
-            color["rgb"]
+            color.rgb
 
             for color in palette.colors
 
