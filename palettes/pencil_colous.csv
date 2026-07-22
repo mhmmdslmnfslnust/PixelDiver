@@ -1,0 +1,14 @@
+Name,Code,R,G,B
+Black,BLK,0,0,0
+White,WHT,255,255,255
+Red,RED,220,20,60
+Orange,ORG,255,140,0
+Yellow,YEL,255,220,0
+Green,GRN,34,139,34
+Light Green,LGR,144,238,144
+Blue,BLU,30,144,255
+Dark Blue,DBL,0,70,140
+Purple,PUR,138,43,226
+Pink,PNK,255,105,180
+Brown,BRN,139,69,19
+Gray,GRY,128,128,128
