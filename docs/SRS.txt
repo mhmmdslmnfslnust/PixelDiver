@@ -1,0 +1,278 @@
+Software Requirements Specification
+Pixel Art Pattern Generator
+
+Version: 1.0
+
+1. Purpose
+
+The software converts an input image into a pixel-art pattern that can be manually recreated on paper using colored pencils.
+
+Each output pixel corresponds to one square on graph paper or an A4 printable grid.
+
+The software is intended primarily for hobby artists who wish to recreate photographs or artwork as pixel art using a limited set of physical pencil colors.
+
+2. Functional Requirements
+2.1 Image Import
+
+The software shall allow the user to open an image.
+
+Supported formats:
+
+PNG
+JPG / JPEG
+BMP
+WebP (optional)
+2.2 Image Preview
+
+The software shall display:
+
+Original image
+Processed image preview
+
+The preview shall update automatically whenever settings change.
+
+2.3 Resize
+
+The user shall specify:
+
+Width (pixels)
+Height (pixels)
+
+Examples:
+
+25 × 25
+50 × 50
+50 × 80
+100 × 150
+
+The software shall resize the image accordingly.
+
+2.4 Resize Algorithm
+
+The user may choose:
+
+Bicubic (default)
+Lanczos
+Bilinear
+Nearest Neighbor
+2.5 Pencil Palette
+
+The software shall allow the user to maintain one or more color palettes.
+
+Each palette consists of:
+
+Color name
+RGB value
+
+Example:
+
+Name	RGB
+Crimson	185,20,35
+Dark Blue	25,40,150
+Yellow	255,230,40
+2.6 Palette Management
+
+The user shall be able to:
+
+Create a new palette
+Rename a palette
+Delete a palette
+Duplicate a palette
+Edit colors
+Add colors
+Remove colors
+
+Palettes shall be saved automatically between sessions.
+
+Palette data shall be stored in editable JSON files.
+
+The user may also manually edit these files outside the application if desired.
+
+2.7 Color Mapping
+
+Each resized pixel shall be converted to the nearest available palette color.
+
+The mapping shall use RGB Euclidean distance.
+
+2.8 Dithering
+
+The software shall provide:
+
+None (default)
+Floyd–Steinberg
+
+Future dithering algorithms may be added later.
+
+2.9 Zoom
+
+The processed image shall support zooming.
+
+Grid lines shall remain visible at high zoom levels.
+
+2.10 Grid Overlay
+
+The user may enable or disable:
+
+Grid lines
+Row numbers
+Column labels
+2.11 Color Legend
+
+The software shall display a legend containing:
+
+Color swatch
+Color name
+2.12 Color Usage
+
+The software shall display how many pixels use each palette color.
+
+Example:
+
+Black       124
+
+White        82
+
+Red          39
+
+Blue         17
+2.13 Export
+
+The software shall export:
+
+PNG
+PDF
+
+The exported document shall include:
+
+Pixel grid
+Color legend
+Row labels
+Column labels
+3. Non-Functional Requirements
+Responsive interface.
+Processing should complete within a few seconds for typical image sizes.
+Runs offline.
+No internet connection required.
+Cross-platform compatibility.
+Automatic saving of palettes and preferences.
+Color Conversion Method
+
+The software shall provide two color conversion methods:
+
+Nearest Color: Each pixel is independently mapped to the closest palette color.
+Floyd–Steinberg Dithering: Pixels are mapped to the closest palette color while propagating quantization error to neighboring pixels, producing smoother gradients and improved visual quality when using limited color palettes.
+4. User Interface
+
+The main window should contain:
+
++---------------------------------------------------------+
+
+ Original Image          Processed Preview
+
++----------------+     +----------------+
+
+|                |     |                |
+
+|                |     |                |
+
+|                |     |                |
+
++----------------+     +----------------+
+
+Image Settings
+
+Width
+
+Height
+
+Resize Method
+
+Palette
+
+Dithering
+
+Zoom
+
+----------------------------------------------------------
+
+Palette Editor
+
++ Color List
+
++ Add
+
+Edit
+
+Delete
+
+Duplicate Palette
+
+New Palette
+
+----------------------------------------------------------
+
+Color Usage
+
+Red      84
+
+Blue     17
+
+Green    52
+
+----------------------------------------------------------
+
+Export PNG
+
+Export PDF
+
+5. File Storage
+
+The application shall store:
+
+settings.json
+
+palettes/
+
+    Prismacolor.json
+
+    FaberCastell.json
+
+    MyPalette.json
+
+Each palette file shall contain:
+
+{
+    "name": "My Palette",
+    "colors": [
+        {
+            "name": "Red",
+            "rgb": [220, 30, 40]
+        },
+        {
+            "name": "Blue",
+            "rgb": [20, 60, 200]
+        }
+    ]
+}
+6. Future Features (Out of Scope for Version 1)
+Additional dithering algorithms (Atkinson, Bayer, Jarvis–Judice–Ninke, etc.)
+Brightness, contrast, and saturation adjustments
+Crop and rotate tools
+Undo/redo
+Drag-and-drop image import
+Paint-by-numbers progress tracking
+Multiple export layouts
+Custom paper sizes
+Color-blind accessibility options
+7. Success Criteria
+
+The application is considered complete when it can:
+
+Load an image.
+Resize it to a user-defined grid.
+Convert every pixel to the nearest color from a selected palette.
+Optionally apply Floyd–Steinberg dithering.
+Display a zoomable preview with a visible grid.
+Save and load custom palettes.
+Export a printable pattern with a color legend.
+Run entirely offline on Windows.
