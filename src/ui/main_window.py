@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QSlider,
     QComboBox,
     QCheckBox,
+    QDialog,
 )
 
 from ui.image_viewer import ImageViewer
@@ -18,6 +19,7 @@ from models.image_document import ImageDocument
 from processing.processor import ImageProcessor
 from processing.palette import PaletteManager
 from export.image_exporter import ImageExporter
+from ui.export_dialog import ExportDialog
 
 
 class MainWindow(QMainWindow):
@@ -357,6 +359,11 @@ class MainWindow(QMainWindow):
         if self.document.processed is None:
             return
 
+        dialog = ExportDialog(self)
+
+        if dialog.exec() != QDialog.Accepted:
+            return
+
         filename, _ = QFileDialog.getSaveFileName(
             self,
             "Export Image",
@@ -369,13 +376,14 @@ class MainWindow(QMainWindow):
 
         ImageExporter.save(
             self.document.processed,
-            filename
+            filename,
+            scale=dialog.scale()
         )
 
         self.statusBar().showMessage(
             f"Exported: {filename}"
-        )    
-    
+        )   
+        
     ######################################################
 
     def update_preview(self):
