@@ -1,15 +1,14 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
-from ui.image_viewer import ImageViewer
 from PySide6.QtWidgets import (
     QFileDialog,
     QHBoxLayout,
-    QLabel,
     QMainWindow,
     QWidget,
 )
 
-from services.image_loader import ImageLoader
+from ui.image_viewer import ImageViewer
+from models.image_document import ImageDocument
 
 
 class MainWindow(QMainWindow):
@@ -17,7 +16,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.current_image = None
+        # Current project/document
+        self.document = ImageDocument()
 
         self.setWindowTitle("Diver")
         self.resize(1200, 700)
@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
         if not filename:
             return
 
-        self.current_image = ImageLoader.load(filename)
+        self.document.load(filename)
 
         self.original_label.set_image(filename)
 

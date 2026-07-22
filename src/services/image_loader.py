@@ -1,16 +1,7 @@
-from PIL import Image
+"""
+Reserved for future import/export utilities.
 
+Phase 1 originally used ImageLoader directly.
 
-class ImageLoader:
-    """
-    Responsible only for loading images.
-
-    Future versions will also:
-    - resize images
-    - convert image formats
-    - validate images
-    """
-
-    @staticmethod
-    def load(path: str):
-        return Image.open(path)
+Image loading is now handled by ImageDocument.
+"""
