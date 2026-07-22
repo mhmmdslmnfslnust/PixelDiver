@@ -1,5 +1,6 @@
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction, QPixmap
+from PySide6.QtGui import QAction
+from ui.image_viewer import ImageViewer
 from PySide6.QtWidgets import (
     QFileDialog,
     QHBoxLayout,
@@ -47,18 +48,11 @@ class MainWindow(QMainWindow):
 
         layout = QHBoxLayout()
 
-        self.original_label = QLabel("Original Image")
-        self.processed_label = QLabel("Processed Preview\n\n(Coming in Phase 2)")
+        self.original_label = ImageViewer("Original Image")
 
-        for label in (self.original_label, self.processed_label):
-            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            label.setMinimumSize(400, 400)
-            label.setStyleSheet("""
-                QLabel{
-                    border:1px solid gray;
-                    background:white;
-                }
-            """)
+        self.processed_label = ImageViewer(
+            "Processed Preview\n\n(Coming in Phase 3)"
+        )
 
         layout.addWidget(self.original_label)
         layout.addWidget(self.processed_label)
@@ -79,14 +73,6 @@ class MainWindow(QMainWindow):
 
         self.current_image = ImageLoader.load(filename)
 
-        pixmap = QPixmap(filename)
-
-        self.original_label.setPixmap(
-            pixmap.scaled(
-                self.original_label.size(),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
-            )
-        )
+        self.original_label.set_image(filename)
 
         self.statusBar().showMessage(filename)
