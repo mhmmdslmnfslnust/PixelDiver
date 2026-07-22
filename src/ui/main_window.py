@@ -14,7 +14,9 @@ from PySide6.QtWidgets import (
 
 from ui.image_viewer import ImageViewer
 from models.image_document import ImageDocument
-from processing.resizer import ImageResizer
+
+from processing.processor import ImageProcessor
+from processing.palette import Palettes
 
 
 class MainWindow(QMainWindow):
@@ -121,6 +123,18 @@ class MainWindow(QMainWindow):
 
         controls.addWidget(self.resize_method)
 
+        ##################################################
+        # Palette
+        ##################################################
+
+        controls.addSpacing(20)
+
+        self.palette_checkbox = QCheckBox("Enable Palette Reduction")
+
+        controls.addWidget(self.palette_checkbox)
+
+        ##################################################
+
         controls.addStretch()
 
         sidebar = QWidget()
@@ -154,6 +168,10 @@ class MainWindow(QMainWindow):
         self.height_slider.valueChanged.connect(self.height_changed)
 
         self.resize_method.currentTextChanged.connect(
+            self.update_preview
+        )
+
+        self.palette_checkbox.stateChanged.connect(
             self.update_preview
         )
 
@@ -244,13 +262,20 @@ class MainWindow(QMainWindow):
         if self.document.original is None:
             return
 
-        resized = ImageResizer.resize(
-            self.document.original,
-            self.width_slider.value(),
-            self.height_slider.value(),
-            self.resize_method.currentText()
+        palette = None
+
+        if self.palette_checkbox.isChecked():
+            palette = Palettes.BASIC
+
+        image = ImageProcessor.process(
+            image=self.document.original,
+            width=self.width_slider.value(),
+            height=self.height_slider.value(),
+            resize_method=self.resize_method.currentText(),
+            palette=palette,
+            dithering=False,
         )
 
-        self.document.resized = resized
+        self.document.processed = image
 
-        self.processed_label.set_pil_image(resized)
+        self.processed_label.set_pil_image(image)
